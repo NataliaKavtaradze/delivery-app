@@ -1,0 +1,13 @@
+{
+  "couriers": [],
+  "users": [],
+  "bookings": [
+    {
+  "id": 1,
+  "userId": 1,
+  "courierId": 2,
+  "day": "monday",
+  "time": "10:00"
+}
+  ]
+}
