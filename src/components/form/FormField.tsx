@@ -1,58 +1,46 @@
 import { TextField, MenuItem } from "@mui/material"
-import { useFormContext } from "react-hook-form"
-import  type { FieldConfig } from "@/types/form.types"
 
-type Props = {
-  field: FieldConfig
-}
-
-export const FormField = ({ field }: Props) => {
-  const {
-    register,
-    formState: { errors },
-  } = useFormContext()
-
-  const error = errors[field.name]
-
-  switch (field.type) {
-    case "select":
-      return (
-        <TextField
-          select
-          label={field.label}
-          {...register(field.name, { required: field.required })}
-          error={!!error}
-          helperText={error && "Required"}
-          fullWidth
-          margin="normal"
-        >
-          {field.options?.map((opt) => (
-            <MenuItem key={opt.value} value={opt.value}>
-              {opt.label}
-            </MenuItem>
-          ))}
-        </TextField>
-      )
-
-    case "file":
-      return (
-        <input
-          type="file"
-          {...register(field.name, { required: field.required })}
-        />
-      )
-
-    default:
-      return (
-        <TextField
-          type={field.type}
-          label={field.label}
-          {...register(field.name, { required: field.required })}
-          error={!!error}
-          helperText={error && "Required"}
-          fullWidth
-          margin="normal"
-        />
-      )
+export const FormField = ({ field, value, onChange, error }: any) => {
+  if (field.type === "select") {
+    return (
+      <TextField
+        select
+        fullWidth
+        label={field.label}
+        value={value || ""}
+        onChange={(e) => onChange(field.name, e.target.value)}
+        error={!!error}
+        helperText={error}
+      >
+        {field.options?.map((opt: any) => (
+          <MenuItem key={opt.value} value={opt.value}>
+            {opt.label}
+          </MenuItem>
+        ))}
+      </TextField>
+    )
   }
+
+  if (field.type === "file") {
+    return (
+      <input
+        type="file"
+        onChange={(e) =>
+          onChange(field.name, e.target.files?.[0])
+        }
+      />
+    )
+  }
+
+  return (
+    <TextField
+      fullWidth
+      type={field.type}
+      label={field.label}
+      value={value || ""}
+      onChange={(e) => onChange(field.name, e.target.value)}
+      error={!!error}
+      helperText={error}
+    />
+  )
 }

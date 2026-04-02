@@ -3,42 +3,59 @@ import { useAuth } from "./context/AuthContext"
 import MainLayout from "./components/form/Laypot/MainLayout"
 
 import LoginPage from "./pages/LoginPage"
+import RegisterPage from "./pages/RegisterPage"
+
 import AdminDashboard from "./pages/admin/AdminDashboard"
 import UsersPage from "./pages/admin/UserPage"
 import CouriersPage from "./pages/admin/CourierPage"
+
 import UserDashboard from "./pages/user/UserDashboard"
 
 function App() {
   const { user } = useAuth()
 
-  if (!user) return <LoginPage />
-
   return (
     <BrowserRouter>
-      <MainLayout>
-        <Routes>
-          {/* 👑 ADMIN */}
-          {user.role === "admin" && (
-            <>
-              <Route path="/" element={<AdminDashboard />} />
-              <Route path="/users" element={<UsersPage />} />
-              <Route path="/couriers" element={<CouriersPage />} />
-            </>
-          )}
+      <Routes>
+        {/* 🔓 Public */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
 
-          {/* 👤 USER */}
-          {user.role === "user" && (
-            <Route path="/" element={<UserDashboard />} />
-          )}
+        {/* 🔐 Protected */}
+        <Route
+          path="/*"
+          element={
+            user ? (
+              <MainLayout>
+                <Routes>
+                  {/* 👑 ADMIN */}
+                  {user.role === "admin" && (
+                    <>
+                      <Route path="/" element={<AdminDashboard />} />
+                      <Route path="/users" element={<UsersPage />} />
+                      <Route path="/couriers" element={<CouriersPage />} />
+                    </>
+                  )}
 
-          {/* 🚴 COURIER */}
-          {user.role === "courier" && (
-            <Route path="/" element={<div>Courier Dashboard</div>} />
-          )}
+                  {/* 👤 USER */}
+                  {user.role === "user" && (
+                    <Route path="/" element={<UserDashboard />} />
+                  )}
 
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </MainLayout>
+                  {/* 🚴 COURIER */}
+                  {user.role === "courier" && (
+                    <Route path="/" element={<div>Courier Dashboard</div>} />
+                  )}
+
+                  <Route path="*" element={<Navigate to="/" />} />
+                </Routes>
+              </MainLayout>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+      </Routes>
     </BrowserRouter>
   )
 }

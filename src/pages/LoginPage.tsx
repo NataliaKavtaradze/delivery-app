@@ -8,16 +8,21 @@ import {
 } from "@mui/material"
 import { useState } from "react"
 import { useAuth } from "../context/AuthContext"
+import { Link as RouterLink } from "react-router-dom"
+import { Link } from "@mui/material"
+import { useNavigate } from "react-router-dom"
 
 export default function LoginPage() {
   const { login } = useAuth()
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [role, setRole] = useState("user")
+  const [role, setRole] = useState<"user" | "admin" | "courier">("user")
+  const navigate = useNavigate()
 
   const handleLogin = () => {
-    login({ email, role: role as any })
+    login({ email, role })
+    navigate("/")   // 🔥 redirect
   }
 
   return (
@@ -51,8 +56,16 @@ export default function LoginPage() {
         </Typography>
 
         <Typography variant="body2" mb={3}>
-          Or create a new account
-        </Typography>
+            Or{" "}
+            <Link
+              component={RouterLink}
+              to="/register"
+              underline="hover"
+              sx={{ cursor: "pointer" }}
+            >
+              create a new account
+            </Link>
+          </Typography>
 
         {/* ROLE */}
         <Typography mb={1}>Select Role</Typography>

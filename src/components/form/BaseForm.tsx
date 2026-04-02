@@ -1,14 +1,17 @@
 import { useState } from "react"
-import { TextField, Button, Box, Typography } from "@mui/material"
+import { Button, Box } from "@mui/material"
 import WorkingDaysField from "./WorkingDaysField"
 import { uploadToCloudinary } from "../../services/cloudinary"
 import { validateForm } from "../../utils/validation"
-import UploadField from "./fields/UploadField"
+import { FormField } from "./FormField"
 
 export default function BaseForm({ fields, onSubmit }: any) {
-  const [formData, setFormData] = useState<any>({})
+  const [formData, setFormData] = useState<any>({
+  role: "user"
+})
   const [errors, setErrors] = useState<any>({})
-
+  
+  const role = formData.role
   const handleChange = (name: string, value: any) => {
     setFormData((prev: any) => ({
       ...prev,
@@ -41,49 +44,34 @@ export default function BaseForm({ fields, onSubmit }: any) {
     boxShadow: "0 10px 30px rgba(0,0,0,0.1)"
   }}>
       
-      <Typography variant="h5" fontWeight={600} mb={2}>
-         Courier Registration
-      </Typography>
-      {fields.map((field: any) => {
-        if (field.type === "workingDays") {
-          return (
-            <Box key={field.name} mt={2}>
-              <WorkingDaysField
-                value={formData.workingDays || []}
-                onChange={(val) => handleChange("workingDays", val)}
-              />
-              {errors.workingDays && (
-                <Typography color="error">
-                  {errors.workingDays}
-                </Typography>
-              )}
-            </Box>
-          )
-        }
+          {fields.map((field: any) => {
+  // USER
+  if (field.name === "address" && role !== "user") return null
 
-        return (
-          <Box key={field.name} mb={2}>
-            {field.type === "file" ? (
-              <UploadField
-    onChange={(file) => handleChange(field.name, file)}
-    error={errors[field.name]}
-  />
-            ) : (
-              <TextField
-                fullWidth
-                label={field.label}
-                type={field.type}
-                onChange={(e) =>
-                  handleChange(field.name, e.target.value)
-                }
-                error={!!errors[field.name]}
-                helperText={errors[field.name]}
-              />
-            )}
-          </Box>
-        )
-      })}
-
+  // COURIER ONLY
+ if (field.name === "workingDays" && role !== "courier") return null
+if (field.name === "vehicle" && role !== "courier") return null
+if (field.name === "address" && role !== "user") return null
+  return (
+    <Box key={field.name} mb={2}>
+      {field.name === "workingDays" ? (
+        <>
+          <WorkingDaysField
+            value={formData.workingDays || []}
+            onChange={(val) => handleChange("workingDays", val)}
+          />
+        </>
+      ) : (
+        <FormField
+          field={field}
+          value={formData[field.name]}
+          onChange={handleChange}
+          error={errors[field.name]}
+        />
+      )}
+    </Box>
+  )
+})}
       <Button
         variant="contained"
         fullWidth
@@ -94,8 +82,9 @@ export default function BaseForm({ fields, onSubmit }: any) {
   }}
         onClick={handleSubmit}
       >
-        Submit
+       Create Account
       </Button>
     </Box>
   )
+  console.log("ROLE:", role)
 }
